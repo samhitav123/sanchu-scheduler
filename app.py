@@ -11,6 +11,12 @@ from langchain_core.output_parsers import StrOutputParser
 
 st.set_page_config(page_title="Sanchu Scheduler", page_icon="🏥", layout="wide")
 
+with open("styles.css") as f:
+    st.markdown(
+        f"<style>{f.read()}</style>",
+        unsafe_allow_html=True
+    )
+
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
