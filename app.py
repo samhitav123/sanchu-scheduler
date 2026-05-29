@@ -23,6 +23,7 @@ except FileNotFoundError:
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+# ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
         "Resident Name", "Request Type", "Start Date", "End Date", "Reason", "Status"
@@ -51,7 +52,7 @@ if "page" not in st.session_state:
     st.session_state.page = "Home"
 
 
-def set_page(page_name):
+def go(page_name):
     st.session_state.page = page_name
     st.rerun()
 
@@ -64,7 +65,6 @@ def chief_login():
         if st.button("Login"):
             if password == CHIEF_PASSWORD:
                 st.session_state.chief_logged_in = True
-                st.success("Chief access unlocked.")
                 st.session_state.page = "Chief Dashboard"
                 st.rerun()
             else:
@@ -244,21 +244,12 @@ def show_calendar(schedule_df):
 
 
 # ---------- SIDEBAR ----------
-st.sidebar.markdown("<div class='sidebar-title'>Sue Scheduler</div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div class='sidebar-brand'>Sue Scheduler</div>", unsafe_allow_html=True)
 
 public_pages = ["Home", "Public Schedule", "Submit Request"]
+chief_pages = ["Chief Dashboard", "Generate Draft Schedule", "Chief Approval", "AI Assistant"]
 
-chief_pages = [
-    "Chief Dashboard",
-    "Generate Draft Schedule",
-    "Chief Approval",
-    "AI Assistant"
-]
-
-if st.session_state.chief_logged_in:
-    pages = public_pages + chief_pages
-else:
-    pages = public_pages
+pages = public_pages + chief_pages if st.session_state.chief_logged_in else public_pages
 
 selected_page = st.sidebar.radio(
     "",
@@ -281,7 +272,6 @@ if not st.session_state.chief_logged_in:
             if password == CHIEF_PASSWORD:
                 st.session_state.chief_logged_in = True
                 st.session_state.page = "Chief Dashboard"
-                st.success("Chief access unlocked.")
                 st.rerun()
             else:
                 st.error("Incorrect password.")
@@ -297,50 +287,23 @@ else:
 page = st.session_state.page
 
 
-# ---------- HOME / LANDING PAGE ----------
+# ---------- HOME ----------
 if page == "Home":
     st.markdown("""
-    <div class="landing">
+    <section class="landing-hero">
         <div class="blue-glow"></div>
-
-        <div class="eyebrow">AI-powered residency scheduling</div>
-
-        <h1 class="hero-title">
-            Residency scheduling without spreadsheet chaos.
-        </h1>
-
+        <p class="eyebrow">AI-powered residency scheduling</p>
+        <h1 class="hero-title">Sue Scheduler</h1>
         <p class="hero-subtitle">
-            Sue Scheduler helps chief residents manage time-off requests,
-            generate draft schedules, and review conflicts before schedules go public.
+            Residency scheduling without spreadsheet chaos.
         </p>
-    </div>
+    </section>
     """, unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns([1.6, 1, 1.6])
+    st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
 
-    with c2:
-        if st.button("Submit a Request"):
-            set_page("Submit Request")
-
-        if st.button("View Public Schedule"):
-            set_page("Public Schedule")
-
-    st.markdown("""
-    <div class="feature-grid">
-        <div class="feature-card">
-            <h3>Request Management</h3>
-            <p>Residents submit vacation, conference, sick leave, and swap requests.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Draft Builder</h3>
-            <p>Generate monthly draft schedules that stay private until approved.</p>
-        </div>
-        <div class="feature-card">
-            <h3>AI Review</h3>
-            <p>Ask Sue AI to summarize requests, conflicts, and coverage gaps.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Public Schedule</h1>", unsafe_allow_html=True)
+    show_calendar(st.session_state.posted_schedule)
 
 
 # ---------- PUBLIC SCHEDULE ----------
@@ -351,7 +314,14 @@ elif page == "Public Schedule":
 
 # ---------- SUBMIT REQUEST ----------
 elif page == "Submit Request":
-    st.markdown("<h1 class='page-title'>Submit Request</h1>", unsafe_allow_html=True)
+    top1, top2 = st.columns([8, 1])
+
+    with top1:
+        st.markdown("<h1 class='page-title'>Submit Request</h1>", unsafe_allow_html=True)
+
+    with top2:
+        if st.button("✕"):
+            go("Home")
 
     st.markdown("""
     <div class="soft-card">
@@ -459,22 +429,16 @@ elif page == "Chief Approval":
                     st.rerun()
 
 
-# ---------- GENERATE DRAFT SCHEDULE ----------
+# ---------- GENERATE DRAFT ----------
 elif page == "Generate Draft Schedule":
     chief_login()
 
     st.markdown("<h1 class='page-title'>Draft Builder</h1>", unsafe_allow_html=True)
-
     st.warning("This creates a draft schedule only. It will not become public until approved and posted.")
 
     today = date.today()
 
-    selected_year = st.number_input(
-        "Year",
-        min_value=2026,
-        max_value=2035,
-        value=today.year
-    )
+    selected_year = st.number_input("Year", min_value=2026, max_value=2035, value=today.year)
 
     selected_month = st.selectbox(
         "Month",
@@ -523,7 +487,7 @@ elif page == "Generate Draft Schedule":
                 st.error("Fix NEEDS COVERAGE shifts before posting.")
 
 
-# ---------- AI ASSISTANT ----------
+# ---------- AI ----------
 elif page == "AI Assistant":
     chief_login()
 
