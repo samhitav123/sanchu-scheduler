@@ -12,7 +12,12 @@ from langchain_core.output_parsers import StrOutputParser
 APP_NAME = "Sue Scheduler"
 CHIEF_PASSWORD = "sanchu123"
 
-st.set_page_config(page_title=APP_NAME, page_icon="💙", layout="wide")
+st.set_page_config(
+    page_title=APP_NAME,
+    page_icon="💙",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 try:
     with open("styles.css") as f:
@@ -24,7 +29,6 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
-# ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
         "Resident Name", "Request Type", "Start Date", "End Date", "Reason", "Status"
@@ -53,7 +57,6 @@ if "page" not in st.session_state:
     st.session_state.page = "Home"
 
 
-# ---------- FUNCTIONS ----------
 def go(page_name):
     st.session_state.page = page_name
     st.rerun()
@@ -246,7 +249,6 @@ def show_calendar(schedule_df):
                     st.markdown("<div class='calendar-card empty'></div>", unsafe_allow_html=True)
 
 
-# ---------- SIDEBAR ----------
 st.sidebar.markdown("<div class='sidebar-brand'>Sue Scheduler</div>", unsafe_allow_html=True)
 
 public_pages = ["Home", "Public Schedule", "Submit Request"]
@@ -296,32 +298,31 @@ else:
 page = st.session_state.page
 
 
-# ---------- HOME / LANDING ----------
 if page == "Home":
-    st.markdown("""
-    <section class="landing-page">
-        <div class="landing-glow">
-            <h1>sue scheduler</h1>
-        </div>
-        <p class="landing-subtitle">
-            AI-powered residency scheduling without spreadsheet chaos.
-        </p>
-    </section>
-    """, unsafe_allow_html=True)
+    try:
+        st.markdown("<div class='landing-wrap'>", unsafe_allow_html=True)
+        st.image("landing.png", use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    except Exception:
+        st.markdown("""
+        <section class="landing-fallback">
+            <div class="fallback-glow">
+                <h1>sue scheduler</h1>
+            </div>
+        </section>
+        """, unsafe_allow_html=True)
 
-    st.markdown("<div class='smooth-section'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-spacer'></div>", unsafe_allow_html=True)
 
     st.markdown("<h1 class='page-title'>Public Schedule</h1>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
 
 
-# ---------- PUBLIC SCHEDULE ----------
 elif page == "Public Schedule":
     st.markdown("<h1 class='page-title'>Public Schedule</h1>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
 
 
-# ---------- SUBMIT REQUEST ----------
 elif page == "Submit Request":
     top1, top2 = st.columns([8, 1])
 
@@ -383,7 +384,6 @@ elif page == "Submit Request":
                 st.success("Request submitted. Status: Pending.")
 
 
-# ---------- CHIEF DASHBOARD ----------
 elif page == "Chief Dashboard":
     chief_login()
 
@@ -408,7 +408,6 @@ elif page == "Chief Dashboard":
     st.session_state.residents = edited_residents
 
 
-# ---------- CHIEF APPROVAL ----------
 elif page == "Chief Approval":
     chief_login()
 
@@ -438,7 +437,6 @@ elif page == "Chief Approval":
                     st.rerun()
 
 
-# ---------- GENERATE DRAFT ----------
 elif page == "Generate Draft Schedule":
     chief_login()
 
@@ -502,7 +500,6 @@ elif page == "Generate Draft Schedule":
                 st.error("Fix NEEDS COVERAGE shifts before posting.")
 
 
-# ---------- AI ----------
 elif page == "AI Assistant":
     chief_login()
 
