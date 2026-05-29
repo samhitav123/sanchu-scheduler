@@ -24,21 +24,6 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
-# ---------- TOP LOGO ----------
-st.markdown("<div class='logo-wrap'>", unsafe_allow_html=True)
-try:
-    st.image("logo.png", width=280)
-except Exception:
-    st.markdown(f"<h1>{APP_NAME}</h1>", unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown(
-    "<p class='subtitle'>AI-assisted residency scheduling for chief residents</p>",
-    unsafe_allow_html=True
-)
-
-
-# ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
         "Resident Name", "Request Type", "Start Date", "End Date", "Reason", "Status"
@@ -64,7 +49,6 @@ if "chief_logged_in" not in st.session_state:
     st.session_state.chief_logged_in = False
 
 
-# ---------- FUNCTIONS ----------
 def chief_login():
     if not st.session_state.chief_logged_in:
         st.warning("Chief resident access required.")
@@ -194,21 +178,21 @@ def show_calendar(schedule_df):
         month += 12
         year -= 1
 
-    col1, col2, col3 = st.columns([1, 3, 1])
+    top_left, top_center, top_right = st.columns([1, 3, 1])
 
-    with col1:
-        if st.button("⬅ Previous Month"):
+    with top_left:
+        if st.button("← Previous"):
             st.session_state.month_offset -= 1
             st.rerun()
 
-    with col2:
+    with top_center:
         st.markdown(
             f"<h2 class='month-title'>{calendar.month_name[month]} {year}</h2>",
             unsafe_allow_html=True
         )
 
-    with col3:
-        if st.button("Next Month ➡"):
+    with top_right:
+        if st.button("Next →"):
             st.session_state.month_offset += 1
             st.rerun()
 
@@ -254,9 +238,9 @@ def show_calendar(schedule_df):
 
 # ---------- SIDEBAR ----------
 try:
-    st.sidebar.image("logo.png", width=170)
+    st.sidebar.image("logo.png", width=135)
 except Exception:
-    st.sidebar.markdown(f"## {APP_NAME}")
+    st.sidebar.markdown(f"<div class='sidebar-title'>{APP_NAME}</div>", unsafe_allow_html=True)
 
 if st.session_state.chief_logged_in:
     pages = [
@@ -270,7 +254,7 @@ if st.session_state.chief_logged_in:
 else:
     pages = ["Public Schedule", "Submit Request"]
 
-page = st.sidebar.radio("Navigation", pages)
+page = st.sidebar.radio("", pages, label_visibility="collapsed")
 
 st.sidebar.divider()
 
@@ -295,16 +279,16 @@ else:
 
 # ---------- PAGES ----------
 if page == "Public Schedule":
-    st.markdown("<h2>Public Posted Schedule</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Public Posted Schedule</h1>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
 
 
 elif page == "Submit Request":
-    st.markdown("<h2>Submit Vacation / Schedule Request</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Submit Request</h1>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class="soft-card">
-        Submit your request below. All new requests start as <b>Pending</b> until the chief resident reviews them.
+        Submit a vacation, conference, day off, sick leave, or swap request. New requests stay pending until reviewed.
     </div>
     """, unsafe_allow_html=True)
 
@@ -355,13 +339,13 @@ elif page == "Submit Request":
 elif page == "Chief Dashboard":
     chief_login()
 
-    st.markdown("<h2>Chief Resident Dashboard</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Chief Dashboard</h1>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
-    col1.metric("Pending Requests", len(st.session_state.requests[st.session_state.requests["Status"] == "Pending"]))
-    col2.metric("Approved Requests", len(st.session_state.requests[st.session_state.requests["Status"] == "Approved"]))
-    col3.metric("Denied Requests", len(st.session_state.requests[st.session_state.requests["Status"] == "Denied"]))
+    col1.metric("Pending", len(st.session_state.requests[st.session_state.requests["Status"] == "Pending"]))
+    col2.metric("Approved", len(st.session_state.requests[st.session_state.requests["Status"] == "Approved"]))
+    col3.metric("Denied", len(st.session_state.requests[st.session_state.requests["Status"] == "Denied"]))
     col4.metric("Residents", len(st.session_state.residents))
 
     st.subheader("All Requests")
@@ -379,13 +363,13 @@ elif page == "Chief Dashboard":
 elif page == "Chief Approval":
     chief_login()
 
-    st.markdown("<h2>Approve / Deny Resident Requests</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Request Approval</h1>", unsafe_allow_html=True)
 
     if st.session_state.requests.empty:
         st.info("No requests yet.")
     else:
         for i, row in st.session_state.requests.iterrows():
-            with st.expander(f"{row['Resident Name']} - {row['Request Type']} - {row['Status']}"):
+            with st.expander(f"{row['Resident Name']} · {row['Request Type']} · {row['Status']}"):
                 st.write(f"**Start:** {row['Start Date']}")
                 st.write(f"**End:** {row['End Date']}")
                 st.write(f"**Reason:** {row['Reason']}")
@@ -408,7 +392,7 @@ elif page == "Chief Approval":
 elif page == "Generate Draft Schedule":
     chief_login()
 
-    st.markdown("<h2>Generate Draft Monthly Schedule</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Draft Builder</h1>", unsafe_allow_html=True)
 
     st.warning("This creates a draft schedule only. It will not become public until approved and posted.")
 
@@ -456,7 +440,7 @@ elif page == "Generate Draft Schedule":
             st.error("Some shifts need coverage before posting.")
             st.dataframe(needs_coverage, use_container_width=True)
 
-        if st.button("Approve and Post Draft Schedule"):
+        if st.button("Approve and Post Draft"):
             if needs_coverage.empty:
                 st.session_state.posted_schedule = st.session_state.draft_schedule[
                     ["Date", "Shift", "Assigned Resident"]
@@ -471,7 +455,7 @@ elif page == "Generate Draft Schedule":
 elif page == "AI Assistant":
     chief_login()
 
-    st.markdown("<h2>Sue AI Assistant</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 class='page-title'>Sue AI Assistant</h1>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class="soft-card">
