@@ -23,6 +23,7 @@ except FileNotFoundError:
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+
 # ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
@@ -52,6 +53,7 @@ if "page" not in st.session_state:
     st.session_state.page = "Home"
 
 
+# ---------- FUNCTIONS ----------
 def go(page_name):
     st.session_state.page = page_name
     st.rerun()
@@ -69,6 +71,7 @@ def chief_login():
                 st.rerun()
             else:
                 st.error("Incorrect password.")
+
         st.stop()
 
 
@@ -185,20 +188,20 @@ def show_calendar(schedule_df):
         month += 12
         year -= 1
 
-    c1, c2, c3 = st.columns([1, 3, 1])
+    top_left, top_center, top_right = st.columns([1, 3, 1])
 
-    with c1:
+    with top_left:
         if st.button("← Previous"):
             st.session_state.month_offset -= 1
             st.rerun()
 
-    with c2:
+    with top_center:
         st.markdown(
             f"<h2 class='month-title'>{calendar.month_name[month]} {year}</h2>",
             unsafe_allow_html=True
         )
 
-    with c3:
+    with top_right:
         if st.button("Next →"):
             st.session_state.month_offset += 1
             st.rerun()
@@ -247,7 +250,13 @@ def show_calendar(schedule_df):
 st.sidebar.markdown("<div class='sidebar-brand'>Sue Scheduler</div>", unsafe_allow_html=True)
 
 public_pages = ["Home", "Public Schedule", "Submit Request"]
-chief_pages = ["Chief Dashboard", "Generate Draft Schedule", "Chief Approval", "AI Assistant"]
+
+chief_pages = [
+    "Chief Dashboard",
+    "Generate Draft Schedule",
+    "Chief Approval",
+    "AI Assistant"
+]
 
 pages = public_pages + chief_pages if st.session_state.chief_logged_in else public_pages
 
@@ -287,20 +296,20 @@ else:
 page = st.session_state.page
 
 
-# ---------- HOME ----------
+# ---------- HOME / LANDING ----------
 if page == "Home":
     st.markdown("""
-    <section class="landing-hero">
-        <div class="blue-glow"></div>
-        <p class="eyebrow">AI-powered residency scheduling</p>
-        <h1 class="hero-title">Sue Scheduler</h1>
-        <p class="hero-subtitle">
-            Residency scheduling without spreadsheet chaos.
+    <section class="landing-page">
+        <div class="landing-glow">
+            <h1>sue scheduler</h1>
+        </div>
+        <p class="landing-subtitle">
+            AI-powered residency scheduling without spreadsheet chaos.
         </p>
     </section>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='smooth-section'></div>", unsafe_allow_html=True)
 
     st.markdown("<h1 class='page-title'>Public Schedule</h1>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
@@ -434,11 +443,17 @@ elif page == "Generate Draft Schedule":
     chief_login()
 
     st.markdown("<h1 class='page-title'>Draft Builder</h1>", unsafe_allow_html=True)
+
     st.warning("This creates a draft schedule only. It will not become public until approved and posted.")
 
     today = date.today()
 
-    selected_year = st.number_input("Year", min_value=2026, max_value=2035, value=today.year)
+    selected_year = st.number_input(
+        "Year",
+        min_value=2026,
+        max_value=2035,
+        value=today.year
+    )
 
     selected_month = st.selectbox(
         "Month",
