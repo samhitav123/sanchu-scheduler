@@ -23,9 +23,11 @@ except FileNotFoundError:
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+
+# ---------- TOP LOGO ----------
 st.markdown("<div class='logo-wrap'>", unsafe_allow_html=True)
 try:
-    st.image("logo.png", width=430)
+    st.image("logo.png", width=280)
 except Exception:
     st.markdown(f"<h1>{APP_NAME}</h1>", unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)
@@ -35,6 +37,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
+# ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
         "Resident Name", "Request Type", "Start Date", "End Date", "Reason", "Status"
@@ -60,6 +64,7 @@ if "chief_logged_in" not in st.session_state:
     st.session_state.chief_logged_in = False
 
 
+# ---------- FUNCTIONS ----------
 def chief_login():
     if not st.session_state.chief_logged_in:
         st.warning("Chief resident access required.")
@@ -72,6 +77,7 @@ def chief_login():
                 st.rerun()
             else:
                 st.error("Incorrect password.")
+
         st.stop()
 
 
@@ -246,7 +252,11 @@ def show_calendar(schedule_df):
                     st.markdown("<div class='calendar-card empty'></div>", unsafe_allow_html=True)
 
 
-st.sidebar.markdown(f"## {APP_NAME}")
+# ---------- SIDEBAR ----------
+try:
+    st.sidebar.image("logo.png", width=170)
+except Exception:
+    st.sidebar.markdown(f"## {APP_NAME}")
 
 if st.session_state.chief_logged_in:
     pages = [
@@ -283,6 +293,7 @@ else:
         st.rerun()
 
 
+# ---------- PAGES ----------
 if page == "Public Schedule":
     st.markdown("<h2>Public Posted Schedule</h2>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
