@@ -521,3 +521,11 @@ elif page == "AI Assistant":
             with st.spinner("Sue AI is reviewing the schedule..."):
                 answer = get_ai_response(user_question)
                 st.write(answer)
+                
+
+st.set_page_config(
+    page_title="Sue Scheduler",
+    page_icon="💙",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)

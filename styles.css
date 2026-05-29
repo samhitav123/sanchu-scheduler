@@ -31,9 +31,10 @@ footer {
     visibility: hidden !important;
 }
 
-[data-testid="collapsedControl"],
-[data-testid="collapsedControl"] * {
-    color: black !important;
+[data-testid="collapsedControl"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 section[data-testid="stSidebar"] {
@@ -322,4 +323,8 @@ div[role="option"]:hover * {
     border: 1px solid var(--line);
     border-radius: 16px;
     padding: 14px;
+}
+section[data-testid="stSidebar"] {
+    min-width: 280px !important;
+    max-width: 280px !important;
 }
