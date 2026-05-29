@@ -54,16 +54,8 @@ if "month_offset" not in st.session_state:
 if "chief_logged_in" not in st.session_state:
     st.session_state.chief_logged_in = False
 
-if "page" not in st.session_state:
-    st.session_state.page = "Home"
-
 
 # ---------------- FUNCTIONS ----------------
-def go(page_name):
-    st.session_state.page = page_name
-    st.rerun()
-
-
 def chief_login():
     if not st.session_state.chief_logged_in:
         st.warning("Chief resident access required.")
@@ -72,7 +64,7 @@ def chief_login():
         if st.button("Login"):
             if password == CHIEF_PASSWORD:
                 st.session_state.chief_logged_in = True
-                st.session_state.page = "Chief Dashboard"
+                st.success("Chief access unlocked.")
                 st.rerun()
             else:
                 st.error("Incorrect password.")
@@ -194,20 +186,20 @@ def show_calendar(schedule_df):
         month += 12
         year -= 1
 
-    c1, c2, c3 = st.columns([1, 3, 1])
+    col1, col2, col3 = st.columns([1, 3, 1])
 
-    with c1:
+    with col1:
         if st.button("← Previous"):
             st.session_state.month_offset -= 1
             st.rerun()
 
-    with c2:
+    with col2:
         st.markdown(
             f"<h2 class='month-title'>{calendar.month_name[month]} {year}</h2>",
             unsafe_allow_html=True
         )
 
-    with c3:
+    with col3:
         if st.button("Next →"):
             st.session_state.month_offset += 1
             st.rerun()
@@ -256,55 +248,47 @@ def show_calendar(schedule_df):
 
 
 # ---------------- SIDEBAR ----------------
-st.sidebar.markdown("<div class='sidebar-brand'>Sue Scheduler</div>", unsafe_allow_html=True)
+with st.sidebar:
+    st.markdown("<div class='sidebar-brand'>Sue Scheduler</div>", unsafe_allow_html=True)
 
-public_pages = ["Home", "Public Schedule", "Submit Request"]
+    if st.session_state.chief_logged_in:
+        pages = [
+            "Home",
+            "Public Schedule",
+            "Submit Request",
+            "Chief Dashboard",
+            "Generate Draft Schedule",
+            "Chief Approval",
+            "AI Assistant"
+        ]
+    else:
+        pages = [
+            "Home",
+            "Public Schedule",
+            "Submit Request"
+        ]
 
-chief_pages = [
-    "Chief Dashboard",
-    "Generate Draft Schedule",
-    "Chief Approval",
-    "AI Assistant"
-]
+    page = st.radio("Navigation", pages)
 
-if st.session_state.chief_logged_in:
-    pages = public_pages + chief_pages
-else:
-    pages = public_pages
+    st.divider()
 
-selected_page = st.sidebar.radio(
-    "Navigation",
-    pages,
-    index=pages.index(st.session_state.page) if st.session_state.page in pages else 0
-)
+    if not st.session_state.chief_logged_in:
+        with st.expander("Chief Resident Login"):
+            password = st.text_input("Password", type="password", key="sidebar_password")
 
-if selected_page != st.session_state.page:
-    st.session_state.page = selected_page
-    st.rerun()
+            if st.button("Login as Chief"):
+                if password == CHIEF_PASSWORD:
+                    st.session_state.chief_logged_in = True
+                    st.success("Chief access unlocked.")
+                    st.rerun()
+                else:
+                    st.error("Incorrect password.")
+    else:
+        st.success("Chief mode active")
 
-st.sidebar.divider()
-
-if not st.session_state.chief_logged_in:
-    with st.sidebar.expander("Chief Resident Login"):
-        password = st.text_input("Password", type="password", key="sidebar_password")
-
-        if st.button("Login as Chief"):
-            if password == CHIEF_PASSWORD:
-                st.session_state.chief_logged_in = True
-                st.session_state.page = "Chief Dashboard"
-                st.rerun()
-            else:
-                st.error("Incorrect password.")
-else:
-    st.sidebar.success("Chief mode active")
-
-    if st.sidebar.button("Log Out"):
-        st.session_state.chief_logged_in = False
-        st.session_state.page = "Home"
-        st.rerun()
-
-
-page = st.session_state.page
+        if st.button("Log Out"):
+            st.session_state.chief_logged_in = False
+            st.rerun()
 
 
 # ---------------- HOME ----------------
@@ -312,7 +296,7 @@ if page == "Home":
     st.markdown("<div class='landing-wrapper'>", unsafe_allow_html=True)
 
     try:
-        st.image("landing.png", width=680)
+        st.image("landing.png", width=520)
     except Exception:
         st.markdown("""
         <div class="landing-fallback">
@@ -323,8 +307,6 @@ if page == "Home":
         """, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='home-gap'></div>", unsafe_allow_html=True)
 
     st.markdown("<h1 class='page-title'>Public Schedule</h1>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
@@ -338,14 +320,7 @@ elif page == "Public Schedule":
 
 # ---------------- SUBMIT REQUEST ----------------
 elif page == "Submit Request":
-    top_left, top_right = st.columns([8, 1])
-
-    with top_left:
-        st.markdown("<h1 class='page-title'>Submit Request</h1>", unsafe_allow_html=True)
-
-    with top_right:
-        if st.button("✕"):
-            go("Home")
+    st.markdown("<h1 class='page-title'>Submit Request</h1>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class="soft-card">
@@ -404,12 +379,12 @@ elif page == "Chief Dashboard":
 
     st.markdown("<h1 class='page-title'>Chief Dashboard</h1>", unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns(4)
 
-    c1.metric("Pending", len(st.session_state.requests[st.session_state.requests["Status"] == "Pending"]))
-    c2.metric("Approved", len(st.session_state.requests[st.session_state.requests["Status"] == "Approved"]))
-    c3.metric("Denied", len(st.session_state.requests[st.session_state.requests["Status"] == "Denied"]))
-    c4.metric("Residents", len(st.session_state.residents))
+    col1.metric("Pending", len(st.session_state.requests[st.session_state.requests["Status"] == "Pending"]))
+    col2.metric("Approved", len(st.session_state.requests[st.session_state.requests["Status"] == "Approved"]))
+    col3.metric("Denied", len(st.session_state.requests[st.session_state.requests["Status"] == "Denied"]))
+    col4.metric("Residents", len(st.session_state.residents))
 
     st.subheader("All Requests")
     st.dataframe(st.session_state.requests, use_container_width=True)
@@ -438,17 +413,17 @@ elif page == "Chief Approval":
                 st.write(f"**End:** {row['End Date']}")
                 st.write(f"**Reason:** {row['Reason']}")
 
-                c1, c2, c3 = st.columns(3)
+                col1, col2, col3 = st.columns(3)
 
-                if c1.button("Approve", key=f"approve_{i}"):
+                if col1.button("Approve", key=f"approve_{i}"):
                     st.session_state.requests.at[i, "Status"] = "Approved"
                     st.rerun()
 
-                if c2.button("Deny", key=f"deny_{i}"):
+                if col2.button("Deny", key=f"deny_{i}"):
                     st.session_state.requests.at[i, "Status"] = "Denied"
                     st.rerun()
 
-                if c3.button("Pending", key=f"pending_{i}"):
+                if col3.button("Pending", key=f"pending_{i}"):
                     st.session_state.requests.at[i, "Status"] = "Pending"
                     st.rerun()
 
@@ -539,4 +514,3 @@ elif page == "AI Assistant":
             with st.spinner("Sue AI is reviewing the schedule..."):
                 answer = get_ai_response(user_question)
                 st.write(answer)
-                

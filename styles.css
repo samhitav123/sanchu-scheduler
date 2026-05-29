@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-    --bg: #ffffff;
-    --text: #0f172a;
+    --navy: #0f172a;
     --muted: #64748b;
     --line: #e5e7eb;
     --blue: #2563eb;
@@ -13,17 +12,18 @@
 html,
 body,
 .stApp {
-    background: var(--bg) !important;
-    color: var(--text) !important;
+    background: #ffffff !important;
+    color: var(--navy) !important;
     font-family: 'Inter', sans-serif;
 }
 
+/* Normal Streamlit layout */
 .block-container {
     padding-top: 2rem !important;
-    max-width: 1200px !important;
+    max-width: 1150px !important;
 }
 
-/* Streamlit chrome */
+/* Streamlit top chrome */
 [data-testid="stToolbar"],
 #MainMenu,
 footer {
@@ -42,31 +42,22 @@ section[data-testid="stSidebar"] {
 }
 
 section[data-testid="stSidebar"] * {
-    color: var(--text) !important;
+    color: var(--navy) !important;
 }
 
 .sidebar-brand {
-    color: var(--text) !important;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 900;
+    color: var(--navy) !important;
     letter-spacing: -0.04em;
-    line-height: 1.05;
     margin-bottom: 1.5rem;
-}
-
-/* Sidebar collapse arrow */
-[data-testid="collapsedControl"],
-[data-testid="collapsedControl"] * {
-    color: #000000 !important;
-    fill: #000000 !important;
-    opacity: 1 !important;
 }
 
 /* Landing */
 .landing-wrapper {
     background: #ffffff !important;
     text-align: center;
-    padding: 30px 0 40px 0;
+    padding: 30px 0 45px 0;
     margin: 0 auto;
 }
 
@@ -76,19 +67,18 @@ section[data-testid="stSidebar"] * {
     height: auto !important;
     display: block !important;
     margin: 0 auto !important;
-    background: #ffffff !important;
 }
 
 .landing-fallback {
     background: #ffffff !important;
     text-align: center;
-    padding: 40px 0;
+    padding: 45px 0;
 }
 
 .blue-glow {
     width: 520px;
     max-width: 85%;
-    height: 270px;
+    height: 260px;
     border-radius: 999px;
     margin: 0 auto;
     background:
@@ -105,38 +95,39 @@ section[data-testid="stSidebar"] * {
 }
 
 .blue-glow h1 {
-    color: white !important;
+    color: #ffffff !important;
     font-size: 54px !important;
     font-family: Georgia, serif !important;
     font-weight: 700 !important;
     letter-spacing: -0.05em;
 }
 
-.home-gap {
-    height: 20px;
-}
-
 /* Titles */
 .page-title {
-    color: var(--text) !important;
+    color: var(--navy) !important;
     font-size: 42px !important;
     font-weight: 900 !important;
     letter-spacing: -0.04em;
     margin-top: 0 !important;
-    margin-bottom: 1.4rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
-h1, h2, h3 {
-    color: var(--text) !important;
+h1,
+h2,
+h3 {
+    color: var(--navy) !important;
     font-weight: 900 !important;
 }
 
-p, label, span, div {
-    color: var(--text);
+p,
+label,
+span,
+div {
+    color: var(--navy);
 }
 
 label {
-    color: var(--text) !important;
+    color: var(--navy) !important;
     font-weight: 700 !important;
 }
 
@@ -147,90 +138,51 @@ label {
     border-radius: 16px;
     padding: 16px 18px;
     margin-bottom: 20px;
-    color: var(--text);
+    color: var(--navy);
     box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
 }
 
 /* Buttons */
 .stButton > button,
-button[kind="primary"],
-button[kind="secondary"],
-[data-testid="baseButton-secondary"],
-[data-testid="baseButton-primary"],
 [data-testid="stFormSubmitButton"] button {
     background: var(--blue) !important;
     color: #ffffff !important;
     border: none !important;
     border-radius: 999px !important;
     font-weight: 800 !important;
-    font-size: 15px !important;
-    padding: 0.62rem 1.15rem !important;
-    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.18) !important;
+    padding: 0.6rem 1.15rem !important;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18) !important;
 }
 
 .stButton > button *,
-button[kind="primary"] *,
-button[kind="secondary"] *,
-[data-testid="baseButton-secondary"] *,
-[data-testid="baseButton-primary"] *,
 [data-testid="stFormSubmitButton"] button * {
     color: #ffffff !important;
 }
 
 .stButton > button:hover,
-button[kind="primary"]:hover,
-button[kind="secondary"]:hover,
-[data-testid="baseButton-secondary"]:hover,
-[data-testid="baseButton-primary"]:hover,
 [data-testid="stFormSubmitButton"] button:hover {
     background: var(--blue-dark) !important;
-    color: #ffffff !important;
-}
-
-/* Metrics */
-[data-testid="stMetric"] {
-    background: #ffffff !important;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
-}
-
-[data-testid="stMetricLabel"] {
-    color: var(--muted) !important;
-}
-
-[data-testid="stMetricValue"] {
-    color: var(--blue) !important;
 }
 
 /* Alerts */
 [data-testid="stAlert"] {
-    background-color: var(--blue-soft) !important;
+    background: var(--blue-soft) !important;
     border: 1px solid #bfdbfe !important;
     border-left: 4px solid var(--blue) !important;
     border-radius: 14px !important;
 }
 
 [data-testid="stAlert"] * {
-    color: var(--text) !important;
-}
-
-/* Tables */
-[data-testid="stDataFrame"] {
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    box-shadow: none;
+    color: var(--navy) !important;
 }
 
 /* Inputs */
 input,
 textarea {
-    background-color: #ffffff !important;
-    color: var(--text) !important;
-    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: var(--navy) !important;
     border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
 }
 
 input::placeholder,
@@ -244,59 +196,40 @@ textarea::placeholder {
     color: #ffffff !important;
     border-radius: 12px !important;
     border: none !important;
-    box-shadow: none !important;
 }
 
-[data-baseweb="select"],
 [data-baseweb="select"] *,
-[data-baseweb="select"] span,
-[data-baseweb="select"] div,
 [data-baseweb="select"] input {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
 }
 
-[data-baseweb="select"] svg {
-    color: #ffffff !important;
-    fill: #ffffff !important;
-}
-
 div[role="listbox"] {
-    background-color: #ffffff !important;
+    background: #ffffff !important;
     border: 1px solid var(--line) !important;
-    border-radius: 12px !important;
 }
 
 div[role="option"],
 div[role="option"] * {
-    color: var(--text) !important;
-    -webkit-text-fill-color: var(--text) !important;
-    background-color: #ffffff !important;
-}
-
-div[role="option"]:hover,
-div[role="option"]:hover * {
-    background-color: var(--blue-soft) !important;
-    color: var(--blue-dark) !important;
+    color: var(--navy) !important;
+    background: #ffffff !important;
 }
 
 /* Calendar */
 .month-title {
     text-align: center;
-    color: var(--text) !important;
-    font-weight: 900;
+    color: var(--navy) !important;
     font-size: 36px !important;
+    font-weight: 900 !important;
     margin: 0 !important;
 }
 
 .day-name {
-    background: #ffffff;
     color: var(--muted) !important;
-    padding: 8px;
-    border-bottom: 1px solid var(--line);
     text-align: center;
     font-weight: 800;
-    margin-bottom: 8px;
+    padding: 8px;
+    border-bottom: 1px solid var(--line);
 }
 
 .calendar-card {
@@ -306,16 +239,14 @@ div[role="option"]:hover * {
     border-radius: 14px;
     padding: 10px;
     margin-bottom: 10px;
-    box-shadow: none;
 }
 
 .calendar-card.empty {
-    background: #ffffff !important;
     border: 1px dashed var(--line);
 }
 
 .calendar-date {
-    color: var(--text) !important;
+    color: var(--navy) !important;
     font-size: 18px;
     font-weight: 800;
     margin-bottom: 8px;
@@ -323,7 +254,6 @@ div[role="option"]:hover * {
 
 .shift-pill {
     background: var(--blue-soft);
-    color: var(--text) !important;
     border-left: 3px solid var(--blue);
     border-radius: 10px;
     padding: 7px;
@@ -335,10 +265,11 @@ div[role="option"]:hover * {
     color: var(--blue-dark) !important;
 }
 
-/* Chat */
+/* Tables, metrics, chat */
+[data-testid="stDataFrame"],
+[data-testid="stMetric"],
 [data-testid="stChatMessage"] {
-    background-color: #ffffff !important;
+    background: #ffffff !important;
     border: 1px solid var(--line);
     border-radius: 16px;
-    padding: 14px;
 }
