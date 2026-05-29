@@ -1,66 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --cream: #f4eadc;
+    --cream-light: #fff8f0;
+    --sand: #ead9c8;
+    --rose: #8f2f3f;
+    --rose-dark: #6f2330;
+    --brown: #3b2f2f;
+    --muted: #7c6666;
+    --border: #d6b8a6;
+}
+
 .stApp {
-    background-color: #f7fbff;
-    color: #1f2937;
+    background: radial-gradient(circle at top, #fff8f0 0%, #f4eadc 45%, #ead9c8 100%);
+    color: var(--brown);
+    font-family: 'Inter', sans-serif;
+}
+
+.block-container {
+    padding-top: 3rem;
+    max-width: 1180px;
 }
 
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #dceeff 0%, #f8fbff 100%);
+    background: linear-gradient(180deg, #ead9c8 0%, #f7efe6 100%);
+    border-right: 1px solid var(--border);
 }
 
 section[data-testid="stSidebar"] * {
-    color: #1f2937 !important;
+    color: var(--brown) !important;
 }
 
-h1, h2, h3, h4, h5, h6,
-p, label, span, div {
-    color: #1f2937;
+section[data-testid="stSidebar"] h2 {
+    color: var(--rose) !important;
+    font-family: 'Playfair Display', serif;
 }
 
-h1 {
-    color: #1f3b64 !important;
+.hero {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: rgba(255, 248, 240, 0.78);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 24px 30px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(97, 54, 54, 0.10);
+}
+
+.hero-icon {
+    font-size: 54px;
+}
+
+.hero h1 {
+    margin: 0;
+    padding: 0;
+    color: var(--rose) !important;
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
     font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
-h2, h3 {
-    color: #2c4d78 !important;
+.hero p {
+    margin: 6px 0 0 0;
+    color: var(--muted) !important;
+    font-size: 17px;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--rose) !important;
+}
+
+h2 {
+    font-size: 40px !important;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: var(--rose-dark) !important;
+}
+
+p, label, span, div {
+    color: var(--brown);
+}
+
+.soft-card {
+    background: rgba(255, 248, 240, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    color: var(--brown);
+    box-shadow: 0 6px 18px rgba(97, 54, 54, 0.08);
 }
 
 .stButton > button {
-    border-radius: 14px;
+    background-color: var(--rose) !important;
+    color: #fff8f0 !important;
     border: none;
-    background-color: #4a90e2;
-    color: white !important;
+    border-radius: 18px;
+    padding: 0.72rem 1.25rem;
     font-weight: 700;
-    padding: 0.7rem 1.2rem;
+    box-shadow: 0 6px 16px rgba(143, 47, 63, 0.23);
 }
 
 .stButton > button:hover {
-    background-color: #357bd8;
+    background-color: var(--rose-dark) !important;
     color: white !important;
-}
-
-[data-testid="stAlert"] {
-    border-radius: 14px;
+    transform: translateY(-1px);
 }
 
 [data-testid="stMetric"] {
-    background: white;
+    background: rgba(255, 248, 240, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 0 8px 22px rgba(97, 54, 54, 0.10);
+}
+
+[data-testid="stMetricLabel"] {
+    color: var(--muted) !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: var(--rose-dark) !important;
+}
+
+[data-testid="stAlert"] {
+    background-color: #ead4c5;
+    color: var(--rose-dark);
     border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0px 4px 14px rgba(31, 59, 100, 0.08);
+    border: 1px solid #d9b3a2;
+}
+
+[data-testid="stAlert"] * {
+    color: var(--rose-dark) !important;
 }
 
 [data-testid="stDataFrame"] {
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 18px rgba(97, 54, 54, 0.08);
 }
 
 input, textarea {
-    border-radius: 12px !important;
+    background-color: var(--cream-light) !important;
+    color: var(--brown) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--muted) !important;
+}
+
+[data-baseweb="select"] > div {
+    background-color: var(--cream-light) !important;
+    color: var(--brown) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+}
+
+[data-baseweb="select"] span {
+    color: var(--brown) !important;
+}
+
+div[role="listbox"] {
+    background-color: var(--cream-light) !important;
+    border: 1px solid var(--border) !important;
+}
+
+div[role="option"] {
+    color: var(--brown) !important;
+    background-color: var(--cream-light) !important;
+}
+
+div[role="option"] * {
+    color: var(--brown) !important;
+}
+
+div[role="option"]:hover {
+    background-color: #ead4c5 !important;
 }
 
 [data-testid="stChatMessage"] {
-    background-color: white;
-    border-radius: 16px;
-    padding: 12px;
+    background-color: rgba(255, 248, 240, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(97, 54, 54, 0.08);
+}
+
+hr {
+    border-color: var(--border);
+}
+
+.month-title {
+    text-align: center;
+    color: var(--rose-dark) !important;
+    font-family: 'Playfair Display', serif;
+}
+
+.day-name {
+    background: var(--rose);
+    color: #fff8f0 !important;
+    padding: 10px;
+    border-radius: 14px;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.calendar-card {
+    min-height: 125px;
+    background: rgba(255, 248, 240, 0.88);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(97, 54, 54, 0.06);
+}
+
+.calendar-card.empty {
+    background: rgba(244, 234, 220, 0.35);
+    border: 1px dashed rgba(214, 184, 166, 0.5);
+}
+
+.calendar-date {
+    font-family: 'Playfair Display', serif;
+    color: var(--rose-dark) !important;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.shift-pill {
+    background: #ead4c5;
+    color: var(--brown) !important;
+    border-left: 4px solid var(--rose);
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 7px;
+    font-size: 13px;
+}
+
+.shift-pill b {
+    color: var(--rose-dark) !important;
+}
+
+.stExpander {
+    border-radius: 18px !important;
 }

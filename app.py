@@ -11,20 +11,30 @@ from langchain_core.output_parsers import StrOutputParser
 
 st.set_page_config(page_title="Sanchu Scheduler", page_icon="🏥", layout="wide")
 
-with open("styles.css") as f:
-    st.markdown(
-        f"<style>{f.read()}</style>",
-        unsafe_allow_html=True
-    )
+# Load CSS
+try:
+    with open("styles.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+except FileNotFoundError:
+    pass
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 CHIEF_PASSWORD = "sanchu123"
 
-st.title("🏥 Sanchu Scheduler")
-st.caption("AI-assisted residency scheduling dashboard")
+st.markdown("""
+<div class="hero">
+    <div class="hero-icon">🏥</div>
+    <div>
+        <h1>Sanchu Scheduler</h1>
+        <p>AI-assisted residency scheduling for chief residents</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
+
+# ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
         "Resident Name", "Request Type", "Start Date", "End Date", "Reason", "Status"
@@ -50,22 +60,26 @@ if "chief_logged_in" not in st.session_state:
     st.session_state.chief_logged_in = False
 
 
+# ---------- FUNCTIONS ----------
 def chief_login():
     if not st.session_state.chief_logged_in:
+        st.warning("Chief resident access required.")
         password = st.text_input("Chief Password", type="password")
+
         if st.button("Login"):
             if password == CHIEF_PASSWORD:
                 st.session_state.chief_logged_in = True
-                st.success("Logged in as Chief Resident.")
+                st.success("Chief access unlocked.")
                 st.rerun()
             else:
                 st.error("Incorrect password.")
+
         st.stop()
 
 
 def get_ai_response(question):
     if not GROQ_API_KEY:
-        return "GROQ_API_KEY is missing from your .env file."
+        return "GROQ_API_KEY is missing. Add it in your .env file locally or Streamlit Secrets online."
 
     llm = ChatGroq(
         model="openai/gpt-oss-120b",
@@ -78,8 +92,9 @@ def get_ai_response(question):
          """
          You are Sanchu Scheduler AI for a chief resident.
          Summarize requests, approved vacations, draft schedules, posted schedules,
-         and possible conflicts. Do not invent data.
-         Be practical and concise.
+         possible coverage gaps, and scheduling conflicts.
+         Do not invent data. Only use the data provided.
+         Be clear, practical, and concise.
          """),
         ("human",
          """
@@ -115,6 +130,7 @@ def is_resident_available(resident, shift_date):
     for _, row in approved.iterrows():
         start = pd.to_datetime(row["Start Date"]).date()
         end = pd.to_datetime(row["End Date"]).date()
+
         if start <= shift_date <= end:
             return False
 
@@ -162,22 +178,7 @@ def generate_draft_schedule(year, month):
     return pd.DataFrame(draft_rows)
 
 
-page = st.sidebar.radio(
-    "Navigation",
-    [
-        "Public Schedule",
-        "Submit Request",
-        "Chief Dashboard",
-        "Generate Draft Schedule",
-        "Chief Approval",
-        "AI Assistant"
-    ]
-)
-
-
-if page == "Public Schedule":
-    st.header("Public Posted Schedule")
-
+def show_calendar(schedule_df):
     today = date.today()
     month = today.month + st.session_state.month_offset
     year = today.year
@@ -198,51 +199,118 @@ if page == "Public Schedule":
             st.rerun()
 
     with col2:
-        st.subheader(f"{calendar.month_name[month]} {year}")
+        st.markdown(f"<h2 class='month-title'>{calendar.month_name[month]} {year}</h2>", unsafe_allow_html=True)
 
     with col3:
         if st.button("Next Month ➡"):
             st.session_state.month_offset += 1
             st.rerun()
 
-    if st.session_state.posted_schedule.empty:
+    if schedule_df.empty:
         st.info("No public schedule has been posted yet.")
-    else:
-        cal = calendar.Calendar(firstweekday=6)
-        month_days = cal.monthdatescalendar(year, month)
+        return
 
-        days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    cal = calendar.Calendar(firstweekday=6)
+    month_days = cal.monthdatescalendar(year, month)
+
+    day_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    cols = st.columns(7)
+
+    for i, day_name in enumerate(day_names):
+        cols[i].markdown(f"<div class='day-name'>{day_name}</div>", unsafe_allow_html=True)
+
+    for week in month_days:
         cols = st.columns(7)
 
-        for i, d in enumerate(days):
-            cols[i].markdown(f"**{d}**")
+        for i, day in enumerate(week):
+            with cols[i]:
+                if day.month == month:
+                    day_schedule = schedule_df[schedule_df["Date"] == str(day)]
 
-        for week in month_days:
-            cols = st.columns(7)
+                    card_html = f"""
+                    <div class="calendar-card">
+                        <div class="calendar-date">{day.day}</div>
+                    """
 
-            for i, day in enumerate(week):
-                with cols[i]:
-                    if day.month == month:
-                        st.markdown(f"### {day.day}")
+                    for _, row in day_schedule.iterrows():
+                        card_html += f"""
+                        <div class="shift-pill">
+                            <b>{row['Shift']}</b><br>
+                            {row['Assigned Resident']}
+                        </div>
+                        """
 
-                        day_schedule = st.session_state.posted_schedule[
-                            st.session_state.posted_schedule["Date"] == str(day)
-                        ]
-
-                        for _, row in day_schedule.iterrows():
-                            st.write(f"**{row['Shift']}**")
-                            st.caption(row["Assigned Resident"])
+                    card_html += "</div>"
+                    st.markdown(card_html, unsafe_allow_html=True)
+                else:
+                    st.markdown("<div class='calendar-card empty'></div>", unsafe_allow_html=True)
 
 
+# ---------- SIDEBAR ----------
+st.sidebar.markdown("## 🏥 Sanchu Scheduler")
+
+if st.session_state.chief_logged_in:
+    pages = [
+        "Public Schedule",
+        "Submit Request",
+        "Chief Dashboard",
+        "Generate Draft Schedule",
+        "Chief Approval",
+        "AI Assistant"
+    ]
+else:
+    pages = [
+        "Public Schedule",
+        "Submit Request"
+    ]
+
+page = st.sidebar.radio("Navigation", pages)
+
+st.sidebar.divider()
+
+if not st.session_state.chief_logged_in:
+    with st.sidebar.expander("🔒 Chief Resident Login"):
+        password = st.text_input("Password", type="password", key="sidebar_password")
+
+        if st.button("Login as Chief"):
+            if password == CHIEF_PASSWORD:
+                st.session_state.chief_logged_in = True
+                st.success("Chief access unlocked.")
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+else:
+    st.sidebar.success("Chief mode active")
+
+    if st.sidebar.button("Log Out"):
+        st.session_state.chief_logged_in = False
+        st.rerun()
+
+
+# ---------- PUBLIC SCHEDULE ----------
+if page == "Public Schedule":
+    st.markdown("<h2>Public Posted Schedule</h2>", unsafe_allow_html=True)
+    show_calendar(st.session_state.posted_schedule)
+
+
+# ---------- SUBMIT REQUEST ----------
 elif page == "Submit Request":
-    st.header("Submit Vacation / Schedule Request")
+    st.markdown("<h2>Submit Vacation / Schedule Request</h2>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="soft-card">
+        Submit your request below. All new requests start as <b>Pending</b> until the chief resident reviews them.
+    </div>
+    """, unsafe_allow_html=True)
 
     with st.form("request_form"):
         name = st.text_input("Resident Name")
+
         request_type = st.selectbox(
             "Request Type",
             ["Vacation", "Day Off", "Conference", "Sick Leave", "Shift Swap", "Other"]
         )
+
         start_date = st.date_input("Start Date")
         end_date = st.date_input("End Date")
         reason = st.text_area("Reason / Notes")
@@ -279,10 +347,11 @@ elif page == "Submit Request":
                 st.success("Request submitted. Status: Pending.")
 
 
+# ---------- CHIEF DASHBOARD ----------
 elif page == "Chief Dashboard":
     chief_login()
 
-    st.header("Chief Resident Dashboard")
+    st.markdown("<h2>Chief Resident Dashboard</h2>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -303,10 +372,11 @@ elif page == "Chief Dashboard":
     st.session_state.residents = edited_residents
 
 
+# ---------- CHIEF APPROVAL ----------
 elif page == "Chief Approval":
     chief_login()
 
-    st.header("Approve / Deny Resident Requests")
+    st.markdown("<h2>Approve / Deny Resident Requests</h2>", unsafe_allow_html=True)
 
     if st.session_state.requests.empty:
         st.info("No requests yet.")
@@ -332,21 +402,29 @@ elif page == "Chief Approval":
                     st.rerun()
 
 
+# ---------- GENERATE DRAFT SCHEDULE ----------
 elif page == "Generate Draft Schedule":
     chief_login()
 
-    st.header("Generate Draft Monthly Schedule")
+    st.markdown("<h2>Generate Draft Monthly Schedule</h2>", unsafe_allow_html=True)
+
+    st.warning("This creates a draft schedule only. It will not become public until approved and posted.")
 
     today = date.today()
-    selected_year = st.number_input("Year", min_value=2026, max_value=2035, value=today.year)
+
+    selected_year = st.number_input(
+        "Year",
+        min_value=2026,
+        max_value=2035,
+        value=today.year
+    )
+
     selected_month = st.selectbox(
         "Month",
         list(range(1, 13)),
         index=today.month - 1,
         format_func=lambda x: calendar.month_name[x]
     )
-
-    st.warning("This creates a DRAFT schedule only. It will not be public until approved and posted.")
 
     if st.button("Generate Draft Schedule"):
         st.session_state.draft_schedule = generate_draft_schedule(
@@ -365,6 +443,7 @@ elif page == "Generate Draft Schedule":
             num_rows="dynamic",
             use_container_width=True
         )
+
         st.session_state.draft_schedule = edited_draft
 
         needs_coverage = st.session_state.draft_schedule[
@@ -387,12 +466,17 @@ elif page == "Generate Draft Schedule":
                 st.error("Fix NEEDS COVERAGE shifts before posting.")
 
 
+# ---------- AI ASSISTANT ----------
 elif page == "AI Assistant":
     chief_login()
 
-    st.header("Sanchu AI Assistant")
+    st.markdown("<h2>Sanchu AI Assistant</h2>", unsafe_allow_html=True)
 
-    st.caption("Ask: summarize pending requests, find conflicts, who is unavailable, or review the draft schedule.")
+    st.markdown("""
+    <div class="soft-card">
+        Ask about pending requests, approved vacations, coverage gaps, or draft schedule issues.
+    </div>
+    """, unsafe_allow_html=True)
 
     user_question = st.chat_input("Ask Sanchu AI...")
 
