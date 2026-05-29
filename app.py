@@ -9,9 +9,11 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-st.set_page_config(page_title="Sanchu Scheduler", page_icon="🏥", layout="wide")
+APP_NAME = "Sue Scheduler"
+CHIEF_PASSWORD = "sanchu123"
 
-# Load CSS
+st.set_page_config(page_title=APP_NAME, page_icon="🏥", layout="wide")
+
 try:
     with open("styles.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -21,20 +23,18 @@ except FileNotFoundError:
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-CHIEF_PASSWORD = "sanchu123"
+st.markdown("<div class='logo-wrap'>", unsafe_allow_html=True)
+try:
+    st.image("logo.png", width=430)
+except Exception:
+    st.markdown(f"<h1>{APP_NAME}</h1>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("""
-<div class="hero">
-    <div class="hero-icon">🏥</div>
-    <div>
-        <h1>Sanchu Scheduler</h1>
-        <p>AI-assisted residency scheduling for chief residents</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    "<p class='subtitle'>AI-assisted residency scheduling for chief residents</p>",
+    unsafe_allow_html=True
+)
 
-
-# ---------- SESSION STATE ----------
 if "requests" not in st.session_state:
     st.session_state.requests = pd.DataFrame(columns=[
         "Resident Name", "Request Type", "Start Date", "End Date", "Reason", "Status"
@@ -60,7 +60,6 @@ if "chief_logged_in" not in st.session_state:
     st.session_state.chief_logged_in = False
 
 
-# ---------- FUNCTIONS ----------
 def chief_login():
     if not st.session_state.chief_logged_in:
         st.warning("Chief resident access required.")
@@ -73,7 +72,6 @@ def chief_login():
                 st.rerun()
             else:
                 st.error("Incorrect password.")
-
         st.stop()
 
 
@@ -90,7 +88,7 @@ def get_ai_response(question):
     prompt = ChatPromptTemplate.from_messages([
         ("system",
          """
-         You are Sanchu Scheduler AI for a chief resident.
+         You are Sue Scheduler AI for a chief resident.
          Summarize requests, approved vacations, draft schedules, posted schedules,
          possible coverage gaps, and scheduling conflicts.
          Do not invent data. Only use the data provided.
@@ -145,7 +143,6 @@ def generate_draft_schedule(year, month):
 
     shifts = ["Day", "Night"]
     days_in_month = calendar.monthrange(year, month)[1]
-
     draft_rows = []
     resident_index = 0
 
@@ -199,7 +196,10 @@ def show_calendar(schedule_df):
             st.rerun()
 
     with col2:
-        st.markdown(f"<h2 class='month-title'>{calendar.month_name[month]} {year}</h2>", unsafe_allow_html=True)
+        st.markdown(
+            f"<h2 class='month-title'>{calendar.month_name[month]} {year}</h2>",
+            unsafe_allow_html=True
+        )
 
     with col3:
         if st.button("Next Month ➡"):
@@ -246,8 +246,7 @@ def show_calendar(schedule_df):
                     st.markdown("<div class='calendar-card empty'></div>", unsafe_allow_html=True)
 
 
-# ---------- SIDEBAR ----------
-st.sidebar.markdown("## 🏥 Sanchu Scheduler")
+st.sidebar.markdown(f"## {APP_NAME}")
 
 if st.session_state.chief_logged_in:
     pages = [
@@ -259,17 +258,14 @@ if st.session_state.chief_logged_in:
         "AI Assistant"
     ]
 else:
-    pages = [
-        "Public Schedule",
-        "Submit Request"
-    ]
+    pages = ["Public Schedule", "Submit Request"]
 
 page = st.sidebar.radio("Navigation", pages)
 
 st.sidebar.divider()
 
 if not st.session_state.chief_logged_in:
-    with st.sidebar.expander("🔒 Chief Resident Login"):
+    with st.sidebar.expander("Chief Resident Login"):
         password = st.text_input("Password", type="password", key="sidebar_password")
 
         if st.button("Login as Chief"):
@@ -287,13 +283,11 @@ else:
         st.rerun()
 
 
-# ---------- PUBLIC SCHEDULE ----------
 if page == "Public Schedule":
     st.markdown("<h2>Public Posted Schedule</h2>", unsafe_allow_html=True)
     show_calendar(st.session_state.posted_schedule)
 
 
-# ---------- SUBMIT REQUEST ----------
 elif page == "Submit Request":
     st.markdown("<h2>Submit Vacation / Schedule Request</h2>", unsafe_allow_html=True)
 
@@ -347,7 +341,6 @@ elif page == "Submit Request":
                 st.success("Request submitted. Status: Pending.")
 
 
-# ---------- CHIEF DASHBOARD ----------
 elif page == "Chief Dashboard":
     chief_login()
 
@@ -372,7 +365,6 @@ elif page == "Chief Dashboard":
     st.session_state.residents = edited_residents
 
 
-# ---------- CHIEF APPROVAL ----------
 elif page == "Chief Approval":
     chief_login()
 
@@ -402,7 +394,6 @@ elif page == "Chief Approval":
                     st.rerun()
 
 
-# ---------- GENERATE DRAFT SCHEDULE ----------
 elif page == "Generate Draft Schedule":
     chief_login()
 
@@ -466,11 +457,10 @@ elif page == "Generate Draft Schedule":
                 st.error("Fix NEEDS COVERAGE shifts before posting.")
 
 
-# ---------- AI ASSISTANT ----------
 elif page == "AI Assistant":
     chief_login()
 
-    st.markdown("<h2>Sanchu AI Assistant</h2>", unsafe_allow_html=True)
+    st.markdown("<h2>Sue AI Assistant</h2>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class="soft-card">
@@ -478,13 +468,13 @@ elif page == "AI Assistant":
     </div>
     """, unsafe_allow_html=True)
 
-    user_question = st.chat_input("Ask Sanchu AI...")
+    user_question = st.chat_input("Ask Sue AI...")
 
     if user_question:
         with st.chat_message("user"):
             st.write(user_question)
 
         with st.chat_message("assistant"):
-            with st.spinner("Sanchu AI is reviewing the schedule..."):
+            with st.spinner("Sue AI is reviewing the schedule..."):
                 answer = get_ai_response(user_question)
                 st.write(answer)
