@@ -17,13 +17,11 @@ body,
     font-family: 'Inter', sans-serif;
 }
 
-/* Normal Streamlit layout */
 .block-container {
     padding-top: 2rem !important;
     max-width: 1150px !important;
 }
 
-/* Streamlit top chrome */
 [data-testid="stToolbar"],
 #MainMenu,
 footer {
@@ -35,7 +33,6 @@ header[data-testid="stHeader"] {
     background: transparent !important;
 }
 
-/* Sidebar */
 section[data-testid="stSidebar"] {
     background: #ffffff !important;
     border-right: 1px solid var(--line) !important;
@@ -45,71 +42,46 @@ section[data-testid="stSidebar"] * {
     color: var(--navy) !important;
 }
 
-.sidebar-brand {
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--navy) !important;
-    letter-spacing: -0.04em;
-    margin-bottom: 1.5rem;
-}
-
-/* Landing */
-.landing-wrapper {
-    background: #ffffff !important;
-    text-align: center;
-    padding: 30px 0 45px 0;
-    margin: 0 auto;
-}
-
-.landing-wrapper img {
-    width: 520px !important;
-    max-width: 85% !important;
-    height: auto !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-.landing-fallback {
-    background: #ffffff !important;
-    text-align: center;
-    padding: 45px 0;
-}
-
-.blue-glow {
-    width: 520px;
-    max-width: 85%;
-    height: 260px;
-    border-radius: 999px;
-    margin: 0 auto;
-    background:
-        radial-gradient(circle at center,
-        #020617 0%,
-        #0f172a 35%,
-        #1d4ed8 65%,
-        #60a5fa 85%,
-        rgba(255,255,255,0) 100%);
-    filter: blur(5px);
+.hero {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 20px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 20px 24px;
+    margin-bottom: 26px;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.04);
 }
 
-.blue-glow h1 {
-    color: #ffffff !important;
-    font-size: 54px !important;
-    font-family: Georgia, serif !important;
-    font-weight: 700 !important;
+.hero-logo-wrap {
+    width: 120px;
+    height: 70px;
+    overflow: hidden;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-logo {
+    width: 150px;
+    height: auto;
+}
+
+.hero h1 {
+    margin: 0;
+    color: var(--navy) !important;
+    font-size: 42px;
+    font-weight: 900;
     letter-spacing: -0.05em;
 }
 
-/* Titles */
-.page-title {
-    color: var(--navy) !important;
-    font-size: 42px !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.04em;
-    margin-top: 0 !important;
-    margin-bottom: 1.5rem !important;
+.hero p {
+    margin: 4px 0 0 0;
+    color: var(--muted) !important;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 h1,
@@ -117,6 +89,11 @@ h2,
 h3 {
     color: var(--navy) !important;
     font-weight: 900 !important;
+}
+
+h2 {
+    font-size: 38px !important;
+    letter-spacing: -0.04em;
 }
 
 p,
@@ -131,7 +108,6 @@ label {
     font-weight: 700 !important;
 }
 
-/* Cards */
 .soft-card {
     background: #ffffff !important;
     border: 1px solid var(--line);
@@ -142,7 +118,6 @@ label {
     box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
 }
 
-/* Buttons */
 .stButton > button,
 [data-testid="stFormSubmitButton"] button {
     background: var(--blue) !important;
@@ -164,7 +139,6 @@ label {
     background: var(--blue-dark) !important;
 }
 
-/* Alerts */
 [data-testid="stAlert"] {
     background: var(--blue-soft) !important;
     border: 1px solid #bfdbfe !important;
@@ -176,7 +150,6 @@ label {
     color: var(--navy) !important;
 }
 
-/* Inputs */
 input,
 textarea {
     background: #ffffff !important;
@@ -190,7 +163,6 @@ textarea::placeholder {
     color: var(--muted) !important;
 }
 
-/* Dropdown */
 [data-baseweb="select"] > div {
     background: var(--blue) !important;
     color: #ffffff !important;
@@ -215,7 +187,6 @@ div[role="option"] * {
     background: #ffffff !important;
 }
 
-/* Calendar */
 .month-title {
     text-align: center;
     color: var(--navy) !important;
@@ -265,7 +236,6 @@ div[role="option"] * {
     color: var(--blue-dark) !important;
 }
 
-/* Tables, metrics, chat */
 [data-testid="stDataFrame"],
 [data-testid="stMetric"],
 [data-testid="stChatMessage"] {
